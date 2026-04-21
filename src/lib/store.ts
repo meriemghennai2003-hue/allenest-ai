@@ -26,7 +26,26 @@ export type DoctorVisit = {
   prescription?: string;
 };
 
-const KEYS = { child: "an.child", entries: "an.entries", visits: "an.visits", onboarded: "an.onboarded" };
+export type DailyLog = {
+  id: string;
+  date: string; // YYYY-MM-DD
+  temperature?: number; // °C
+  mood: "happy" | "ok" | "sad" | "sick";
+  sleepHours?: number;
+  symptoms: string[];
+  medication?: string;
+  notes?: string;
+  timestamp: number;
+};
+
+const KEYS = {
+  child: "an.child",
+  entries: "an.entries",
+  visits: "an.visits",
+  onboarded: "an.onboarded",
+  daily: "an.daily",
+  shareCode: "an.shareCode",
+};
 
 const safe = <T,>(k: string, fallback: T): T => {
   if (typeof window === "undefined") return fallback;
