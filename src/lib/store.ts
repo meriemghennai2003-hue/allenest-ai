@@ -26,7 +26,26 @@ export type DoctorVisit = {
   prescription?: string;
 };
 
-const KEYS = { child: "an.child", entries: "an.entries", visits: "an.visits", onboarded: "an.onboarded" };
+export type DailyLog = {
+  id: string;
+  date: string; // YYYY-MM-DD
+  temperature?: number; // °C
+  mood: "happy" | "ok" | "sad" | "sick";
+  sleepHours?: number;
+  symptoms: string[];
+  medication?: string;
+  notes?: string;
+  timestamp: number;
+};
+
+const KEYS = {
+  child: "an.child",
+  entries: "an.entries",
+  visits: "an.visits",
+  onboarded: "an.onboarded",
+  daily: "an.daily",
+  shareCode: "an.shareCode",
+};
 
 const safe = <T,>(k: string, fallback: T): T => {
   if (typeof window === "undefined") return fallback;
@@ -55,6 +74,24 @@ export const store = {
   },
   isOnboarded: () => safe<boolean>(KEYS.onboarded, false),
   setOnboarded: (v: boolean) => localStorage.setItem(KEYS.onboarded, JSON.stringify(v)),
+  getDaily: () => safe<DailyLog[]>(KEYS.daily, []),
+  addDaily: (d: DailyLog) => {
+    const list = [d, ...store.getDaily()];
+    localStorage.setItem(KEYS.daily, JSON.stringify(list));
+    return list;
+  },
+  removeDaily: (id: string) => {
+    const list = store.getDaily().filter((x) => x.id !== id);
+    localStorage.setItem(KEYS.daily, JSON.stringify(list));
+    return list;
+  },
+  getOrCreateShareCode: () => {
+    const existing = safe<string | null>(KEYS.shareCode, null);
+    if (existing) return existing;
+    const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+    if (typeof window !== "undefined") localStorage.setItem(KEYS.shareCode, JSON.stringify(code));
+    return code;
+  },
 };
 
 // Simple rule-based "AI" insights
