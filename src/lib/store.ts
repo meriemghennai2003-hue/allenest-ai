@@ -74,6 +74,24 @@ export const store = {
   },
   isOnboarded: () => safe<boolean>(KEYS.onboarded, false),
   setOnboarded: (v: boolean) => localStorage.setItem(KEYS.onboarded, JSON.stringify(v)),
+  getDaily: () => safe<DailyLog[]>(KEYS.daily, []),
+  addDaily: (d: DailyLog) => {
+    const list = [d, ...store.getDaily()];
+    localStorage.setItem(KEYS.daily, JSON.stringify(list));
+    return list;
+  },
+  removeDaily: (id: string) => {
+    const list = store.getDaily().filter((x) => x.id !== id);
+    localStorage.setItem(KEYS.daily, JSON.stringify(list));
+    return list;
+  },
+  getOrCreateShareCode: () => {
+    const existing = safe<string | null>(KEYS.shareCode, null);
+    if (existing) return existing;
+    const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+    if (typeof window !== "undefined") localStorage.setItem(KEYS.shareCode, JSON.stringify(code));
+    return code;
+  },
 };
 
 // Simple rule-based "AI" insights
